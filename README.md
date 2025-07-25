@@ -19,14 +19,24 @@ This is a full-stack web application that helps caregivers track baby feeding se
 - **Frontend**: Vue.js (planned)
 
 ## 📦 Project Structure
-project/
+<details> <summary>📁 <strong>Project Structure</strong></summary>
+  
+```text
+baby-feeding-tracker/
 ├── backend/
-│ ├── main.py
-│ ├── models.py
-│ ├── schemas.py
-│ └── database.py
-├── frontend/ (coming soon)
+│   ├── database.py
+│   ├── enums.py
+│   ├── feeds.py
+│   ├── main.py
+│   ├── models.py
+│   └── schemas.py
+├── frontend/               # (Coming soon - Vue.js)
+├── feeding.db              # SQLite DB (auto-created)
+├── .gitignore
+├── requirements.txt
 └── README.md
+```
+</details>
 
 ## ⚙️ Setup Instructions
 
@@ -78,7 +88,18 @@ pip freeze > requirements.txt
   
   Swagger UI: http://127.0.0.1:8000/docs
   
-  ReDoc: http://127.0.0.1:8000/redoc
+#💡Tips:
+
+Your database (.sqlite3) file will be created automatically on first run if you’re using SQLite.
+
+If you make schema changes, you may need to delete and recreate the database for now.
+
+To exit the virtual environment: deactivate
+
+yaml
+Copy
+Edit
+
 
 
 
