@@ -30,6 +30,13 @@ def get_all_feedings(session: Session = Depends(get_session)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Server error: {str(e)}")
 
+@router.get("/feedings/{feed_id}", response_model = FeedResponse)
+def get_feed_by_id(feed_id: int, session: Session = Depends(get_session)):
+    feed = session.get(Feed, feed_id)
+    if not feed:
+        raise HTTPException(status_code=404, detail = "Feed entry not found")
+    return feed
+
 @router.delete("/feedings/{feed_id}", status_code=204)
 def delete_feed_entry(feed_id: int, session: Session = Depends(get_session)):
     feed = session.get(Feed, feed_id)
