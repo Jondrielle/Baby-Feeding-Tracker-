@@ -1,9 +1,11 @@
 from schemas import FeedResponse, FeedEntry
 from models import Feed 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, select
 from database import get_session
-from typing import List
+from enums import FeedingMethod
+from datetime import datetime, date
+from typing import List, Optional
 
 router = APIRouter()
 
@@ -21,11 +23,30 @@ def create_feed(feed: FeedEntry, session: Session = Depends(get_session)):
         raise HTTPException(status_code = 400, detail = f"Error with creating feed entry: {e}")
 
 @router.get("/feedings", response_model=List[FeedResponse])
-def get_all_feedings(session: Session = Depends(get_session)):
+def get_all_feedings(
+    method: Optional[FeedingMethod] = Query(None),
+    ml: Optional[float] = Query(None, gt=0),
+    oz: Optional[float] = Query(None, gt=0),
+    date_only: Optional[date] = Query(None),
+    session: Session = Depends(get_session)):
     try:
-        feeds = session.exec(select(Feed)).all()
+        query = select(Feed)
+
+        if method:
+            query = query.where(Feed.method == method)
+        if ml:
+            query = query.where(Feed.amount_ml != None).where(Feed.amount_ml >= ml)
+        if oz:
+            query = query.where(Feed.amount_oz != None).where(Feed.amount_oz >= oz)
+        if date_only:
+            start_dt = datetime.combine(date_only, datetime.min.time())
+            end_dt = datetime.combine(date_only, datetime.max.time())
+            query = query.where(Feed.time >= start_dt, Feed.time <= end_dt)
+
+        feeds = session.exec(query).all()
         if not feeds:
             raise HTTPException(status_code=404, detail="No feed entries found")
+
         return feeds
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Server error: {str(e)}")
